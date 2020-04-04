@@ -125,7 +125,7 @@ void Graph::dfs(int index)
         int index1 = (p->head == index) ? p->tail : p->head;
         if (!visited[index1])
             dfs(index1);
-        p = (vexs[index].out->head == index) ? vexs[index].out->h_link : vexs[index].out->t_link;
+        p = (p->head == index) ? p->h_link :p->t_link;
     }
 
 
