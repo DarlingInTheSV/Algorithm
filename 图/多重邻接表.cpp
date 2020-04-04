@@ -5,14 +5,14 @@
 typedef char vex_type;
 struct G_node
 {
-    int head, tail, info; //head--相同弧头发出的,tail--相同弧尾发出的,info权重
+    int head, tail, info; //info权重
     G_node* h_link, * t_link;//h——link指向与左边顶点同顶点的其他边，t_link指向与右边边顶点同顶点的其他边
     G_node() : head(0), tail(0), info(0), h_link(nullptr), t_link(nullptr) {};
 };
 struct G_list
 {
     vex_type data;
-    G_node* out; //无向，一个指向边的指针
+    G_node* out; //无向图，一个指向边的指针
     G_list() : data(0), out(nullptr) {};
 };
 
@@ -24,7 +24,7 @@ public:
     G_list* vexs;
     Graph();
     ~Graph();
-    int get_num(vex_type& v);
+    int get_num(vex_type& v);//通过数组名称返回节点的下标
     vex_type get_name(int index);//通过数组下标返回节点的名称
     void insert(int head, int tail, int info);
     void create();
@@ -120,10 +120,10 @@ void Graph::dfs(int index)
     std::cout << get_name(index) << std::endl;
     visited[index] = 1;
     G_node* p = vexs[index].out;
-    while (p)
+    while (p)//递归访问每个节点的第一条边
     {
-        int index1 = (p->head == index) ? p->tail : p->head;
-        if (!visited[index1])
+        int index1 = (p->head == index) ? p->tail : p->head;//因为是无向图，不能直接使用tail和head,需要判断该节点对应边中的哪个节点，比如1号节点第一条边是 (0,1,h_link,t_link) （重复利用了0号节点的边）
+        if (!visited[index1])								//则1号节点的下一条边是t_link指向的边，而0号节点的第一条边是h_link指向的边，也就是说要先判断当前顶点对应边中的哪个点，然后才能确定使用哪个指针
             dfs(index1);
         p = (p->head == index) ? p->h_link :p->t_link;
     }
@@ -163,11 +163,14 @@ void Graph::bfs(int index)
 
 int main()
 {
+	//这里使用了C++的cin/cout重定向，直接读取文件并输出到文件，如果你不想使用，将下面的部分和结尾部分注释即可
      std::ifstream fin("多重邻接表测试.txt");//重定向输入为文件
      std::ofstream fout("多重邻接表测试__out.txt");//重定向输出
      std::streambuf *cin_backup = std::cin.rdbuf(fin.rdbuf());//cin.rdbuf(&)带参数返回原来的buffer,并备份
      std::streambuf *cout_backup = std::cout.rdbuf(fout.rdbuf());
 
+
+	 //主程序
     Graph g;
     g.create();
     std::cout<<"--------------------------初始视图--------------------"<<std::endl;
@@ -184,12 +187,14 @@ int main()
     g.dfs();
 
 
+	//主程序
 
 
 
+	//恢复重定向
      std::cin.rdbuf(cin_backup);//不需要读取时，使用备份恢复cin cout到标准输入输出中
      std::cout.rdbuf(cout_backup);
-
+	 //关闭文件读写
      fin.close();
      fout.close();
 }
